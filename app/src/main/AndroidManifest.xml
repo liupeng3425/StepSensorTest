@@ -2,9 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.uestc.peng.stepsensortest">
 
-    <uses-feature android:name="android.hardware.Sensor.stepcounter"/>
-    <uses-feature android:name="android.hardware.Sensor.stepdetector"/>
-
+    <uses-feature android:name="android.hardware.Sensor.stepcounter" />
+    <uses-feature android:name="android.hardware.Sensor.stepdetector" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +18,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".StepCountService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

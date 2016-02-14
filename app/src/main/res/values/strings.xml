@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">StepSensorTest</string>
+    <string name="init_steps">0</string>
 </resources>

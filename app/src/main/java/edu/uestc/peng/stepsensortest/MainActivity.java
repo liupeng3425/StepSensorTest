@@ -1,23 +1,26 @@
 package edu.uestc.peng.stepsensortest;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView textViewCounter, textViewDetector;
-    private int mStepCount = 0;
-    private int mPreviousStep = 0;
-    private SensorEventListener sensorEventListener;
-    private int maxDelay = 10000;
+    private TextView textViewCounter;
+    private BroadcastReceiver broadcastReceiver;
+    private String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,38 +28,36 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textViewCounter = (TextView) findViewById(R.id.tvCounter);
-        textViewDetector = (TextView) findViewById(R.id.tvDetector);
 
-        SensorManager sensorManager = (SensorManager) this.getSystemService(Activity.SENSOR_SERVICE);
+        Intent intent = new Intent(MainActivity.this, StepCountService.class);
+        startService(intent);
 
-        final Sensor stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        Log.i(TAG, "onCreate");
+    }
 
-        sensorEventListener = new SensorEventListener() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter(Constants.ACTION_UPDATE_STEPS);
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
-            public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-                    if (mPreviousStep == 0) {
-                        mPreviousStep = (int) event.values[0];
-                    }
-                    mStepCount = (int) (event.values[0]) - mPreviousStep;
-                    textViewCounter.setText(String.format("%d", mStepCount));
-                } else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
-                    textViewDetector.setText(event.values.toString());
-                }
-            }
+            public void onReceive(Context context, Intent intent) {
+                textViewCounter.setText(intent.getIntExtra("mStepCount", 0) + "");
 
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+                Log.i(TAG, "onReceive");
             }
         };
-        sensorManager.registerListener(sensorEventListener, stepSensor, SensorManager.SENSOR_DELAY_NORMAL, maxDelay);
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SensorManager sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
-        sensorManager.unregisterListener(sensorEventListener);
     }
 }
