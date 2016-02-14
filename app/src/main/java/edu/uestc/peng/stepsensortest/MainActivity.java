@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i(TAG, "onStart");
         Intent intent = new Intent(MainActivity.this, StepCountService.class);
         startService(intent);
     }
