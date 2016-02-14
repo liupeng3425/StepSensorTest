@@ -21,24 +21,18 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewCounter;
     private BroadcastReceiver broadcastReceiver;
     private String TAG = "MainActivity";
+    private IntentFilter intentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.i(TAG, "onCreate");
+
         textViewCounter = (TextView) findViewById(R.id.tvCounter);
 
-        Intent intent = new Intent(MainActivity.this, StepCountService.class);
-        startService(intent);
-
-        Log.i(TAG, "onCreate");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        IntentFilter intentFilter = new IntentFilter(Constants.ACTION_UPDATE_STEPS);
+        intentFilter = new IntentFilter(Constants.ACTION_UPDATE_STEPS);
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -48,12 +42,27 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         registerReceiver(broadcastReceiver, intentFilter);
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(MainActivity.this, StepCountService.class);
+        startService(intent);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(broadcastReceiver);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
