@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.i(TAG, "onCreate");
+        Log.e(TAG, "onCreate");
 
         textViewCounter = (TextView) findViewById(R.id.tvCounter);
 
@@ -38,18 +38,16 @@ public class MainActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 textViewCounter.setText(intent.getIntExtra("mStepCount", 0) + "");
 
-                Log.i(TAG, "onReceive");
+                Log.e(TAG, "onReceive");
             }
         };
         registerReceiver(broadcastReceiver, intentFilter);
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "onStart");
+        Log.e(TAG, "onStart");
         Intent intent = new Intent(MainActivity.this, StepCountService.class);
         startService(intent);
     }
@@ -69,5 +67,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopService(new Intent(MainActivity.this, StepCountService.class));
     }
 }

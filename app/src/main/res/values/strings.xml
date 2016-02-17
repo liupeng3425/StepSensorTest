@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">StepSensorTest</string>
+    <string name="app_name">Step Counter</string>
     <string name="init_steps">0</string>
+    <string name="text_view_today">今天的步数：</string>
 </resources>
