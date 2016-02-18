@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 textViewCounter.setText(intent.getIntExtra("mStepCount", 0) + "");
-
                 Log.e(TAG, "onReceive");
             }
         };
@@ -67,6 +66,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(MainActivity.this, StepCountService.class));
     }
 }
