@@ -6,5 +6,6 @@ package edu.uestc.peng.stepsensortest;
  */
 public class Constants {
     public static String ACTION_UPDATE_STEPS = "edu.uestc.peng.stepSensorTest.UPDATE_STEPS";
+    public static String ACTION_NEW_DAY = "edu.uestc.peng.stepSensorTest.NEW_DAY";
     public static String APP_NAME = "stepSensor";
 }

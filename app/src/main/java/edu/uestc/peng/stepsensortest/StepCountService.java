@@ -1,9 +1,13 @@
 package edu.uestc.peng.stepsensortest;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -11,11 +15,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.text.LoginFilter;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class StepCountService extends Service {
 
@@ -26,6 +31,7 @@ public class StepCountService extends Service {
     private String TAG = "StepCountService";
     private Sensor stepSensor;
     private SensorManager sensorManager;
+    private BroadcastReceiver broadcastReceiver;
 
     public StepCountService() {
     }
@@ -82,6 +88,32 @@ public class StepCountService extends Service {
         SharedPreferences sharedPreferences = StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_PRIVATE);
         mStepCount = sharedPreferences.getInt(getDateString(), 0);
 
+        IntentFilter intentFilter = new IntentFilter(Constants.ACTION_NEW_DAY);
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences = StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_PRIVATE);
+                mStepCount = sharedPreferences.getInt(getDateString(), 0);
+            }
+        };
+        registerReceiver(broadcastReceiver, intentFilter);
+
+        scheduleServiceRestart();
+    }
+
+    private void scheduleServiceRestart() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Calendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.add(Calendar.DATE, 1);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(Constants.ACTION_NEW_DAY), 0);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 24 * 3600 * 1000, pendingIntent);
     }
 
     @Override
@@ -102,6 +134,7 @@ public class StepCountService extends Service {
         Log.e(TAG, "onDestroy");
         SensorManager sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
         sensorManager.unregisterListener(sensorEventListener);
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Nullable
