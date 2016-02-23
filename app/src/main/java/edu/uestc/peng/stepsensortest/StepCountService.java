@@ -49,7 +49,7 @@ public class StepCountService extends Service {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
-                    mStepCount++;
+                    mStepCount += event.values.length;
                     SharedPreferences sharedPreferences = StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_APPEND);
                     sharedPreferences.edit().putInt(getDateString(), mStepCount)
                             .apply();
