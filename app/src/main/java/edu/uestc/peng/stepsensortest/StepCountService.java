@@ -25,7 +25,7 @@ import java.util.GregorianCalendar;
 public class StepCountService extends Service {
 
     private int mStepCount = 0;
-    private int mPreviousStep = 0;
+//    private int mPreviousStep = 0;
     private SensorEventListener sensorEventListener;
     private int maxDelay = 1000;
     private String TAG = "StepCountService";
@@ -50,7 +50,8 @@ public class StepCountService extends Service {
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
                     mStepCount += event.values.length;
-                    SharedPreferences sharedPreferences = StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_APPEND);
+                    SharedPreferences sharedPreferences =
+                            StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_APPEND);
                     sharedPreferences.edit().putInt(getDateString(), mStepCount)
                             .apply();
                     sendBroadcast();
@@ -92,8 +93,7 @@ public class StepCountService extends Service {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                SharedPreferences sharedPreferences = StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_PRIVATE);
-                mStepCount = sharedPreferences.getInt(getDateString(), 0);
+                mStepCount = 0;
             }
         };
         registerReceiver(broadcastReceiver, intentFilter);
@@ -111,19 +111,24 @@ public class StepCountService extends Service {
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.DATE, 1);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(Constants.ACTION_NEW_DAY), 0);
+        PendingIntent pendingIntent =
+                PendingIntent.getBroadcast(this, 0, new Intent(Constants.ACTION_NEW_DAY), 0);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 24 * 3600 * 1000, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(), 24 * 3600 * 1000, pendingIntent);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        SharedPreferences sharedPreferences = StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_PRIVATE);
+//        SharedPreferences sharedPreferences =
+//              StepCountService.this.getSharedPreferences(Constants.APP_NAME, MODE_PRIVATE);
 //        mStepCount = sharedPreferences.getInt(getDateString(), 0);
 //        mPreviousStep = sharedPreferences.getInt(getDateString(), 0);
         Log.e(TAG, "onStartCommand " + mStepCount);
 
-        sensorManager.registerListener(sensorEventListener, stepSensor, SensorManager.SENSOR_DELAY_NORMAL, maxDelay);
+        sensorManager.registerListener(sensorEventListener, stepSensor,
+                SensorManager.SENSOR_DELAY_NORMAL, maxDelay);
+
         sendBroadcast();
         return START_STICKY;
     }
