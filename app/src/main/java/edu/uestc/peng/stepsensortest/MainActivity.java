@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -23,11 +24,16 @@ import android.widget.TextView;
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.AbstractChart;
+import org.achartengine.chart.TimeChart;
+import org.achartengine.model.TimeSeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -90,12 +96,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private GraphicalView getGraphicalView() {
-        XYSeries series = new XYSeries(Constants.XY_SERIES);
+        TimeSeries series = new TimeSeries(Constants.XY_SERIES);
         XYMultipleSeriesDataset seriesDataset = new XYMultipleSeriesDataset();
-        series.add(1, 1);
-        series.add(2, 3);
-        series.add(4, 0);
-        series.add(6, 2);
+
+
+        for (int i = 7; i > 0; i--) {
+            Date date = new Date(new Date().getTime() - TimeChart.DAY * i);
+            series.add(date, getStep(getDateString(date)));
+        }
+
         seriesDataset.addSeries(series);
 
         XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
@@ -103,8 +112,25 @@ public class MainActivity extends AppCompatActivity {
         XYSeriesRenderer simpleSeriesRenderer;
         simpleSeriesRenderer = new XYSeriesRenderer();
         simpleSeriesRenderer.setColor(Color.CYAN);
+        simpleSeriesRenderer.setLineWidth(10);
+        simpleSeriesRenderer.setDisplayChartValues(true);
+        simpleSeriesRenderer.setChartValuesTextSize(50);
         renderer.addSeriesRenderer(simpleSeriesRenderer);
         renderer.setMarginsColor(Color.WHITE);
-        return ChartFactory.getCubeLineChartView(this, seriesDataset, renderer, 1);
+        renderer.setShowLegend(false);
+        renderer.setLabelsTextSize(20);
+        renderer.setPanEnabled(true, false);
+        renderer.setZoomEnabled(false);
+        return ChartFactory.getTimeChartView(this, seriesDataset, renderer,"yyyy年MM月dd日");
+    }
+
+    private int getStep(String date) {
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.APP_NAME, MODE_PRIVATE);
+        return sharedPreferences.getInt(date, 0);
+    }
+
+    private String getDateString(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat.format(date);
     }
 }
