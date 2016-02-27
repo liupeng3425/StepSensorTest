@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = "MainActivity";
     private IntentFilter intentFilter;
 
-    private LinearLayout linearLayoutChart;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
 
         textViewCounter = (TextView) findViewById(R.id.tvCounter);
 
-        linearLayoutChart = (LinearLayout) findViewById(R.id.linearLayoutChart);
-
-        linearLayoutChart.addView(getGraphicalView(),
+        LinearLayout linearLayoutChart = (LinearLayout) findViewById(R.id.linearLayoutChart);
+        GraphicalView graphicalView = getGraphicalView();
+        linearLayoutChart.addView(graphicalView,
                 ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
 
 
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         XYMultipleSeriesDataset seriesDataset = new XYMultipleSeriesDataset();
 
 
-        for (int i = 7; i > 0; i--) {
+        for (int i = 7; i >= 0; i--) {
             Date date = new Date(new Date().getTime() - TimeChart.DAY * i);
             series.add(date, getStep(getDateString(date)));
         }
@@ -121,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         renderer.setLabelsTextSize(20);
         renderer.setPanEnabled(true, false);
         renderer.setZoomEnabled(false);
-        return ChartFactory.getTimeChartView(this, seriesDataset, renderer,"yyyy年MM月dd日");
+        return ChartFactory.getTimeChartView(this, seriesDataset, renderer, "yyyy年MM月dd日");
     }
 
     private int getStep(String date) {
