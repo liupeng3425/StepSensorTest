@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
         renderer.setMarginsColor(Color.WHITE);
         renderer.setShowLegend(false);
         renderer.setLabelsTextSize(20);
-        renderer.setPanEnabled(true, false);
         renderer.setZoomEnabled(false);
         return ChartFactory.getTimeChartView(this, seriesDataset, renderer, "yyyy年MM月dd日");
     }
